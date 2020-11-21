@@ -2,9 +2,11 @@ import dotenv from 'dotenv';
 
 type EnvVars = {
   PORT: number;
+  CERAMIC_API_HOST: string;
+  MONGO_DB_CONNECT: string;
 };
 
-const REQUIRED_ENV_VAR_KEYS = ['PORT'];
+const REQUIRED_ENV_VAR_KEYS = ['PORT', 'CERAMIC_API_HOST', 'MONGO_DB_CONNECT'];
 
 const result = dotenv.config({ path: '.env.local' });
 

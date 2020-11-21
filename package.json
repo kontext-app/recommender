@@ -6,14 +6,21 @@
   "author": "Dong-Ha Kim <dongha.kim210@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1"
+    "@ceramicnetwork/ceramic-http-client": "^0.7.3",
+    "@ceramicstudio/idx": "^0.3.0",
+    "@ceramicstudio/idx-constants": "^0.3.0",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.3",
+    "morgan": "^1.10.0"
   },
   "scripts": {
-    "start": "tsc && node build/src/index.js",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+    "start": "tsc && NODE_PATH=./dist/src node build/src/app.js",
+    "dev": "NODE_PATH=./src nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
+    "@types/mongodb": "^3.5.34",
+    "@types/morgan": "^1.9.2",
     "@types/node": "^14.14.8",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
