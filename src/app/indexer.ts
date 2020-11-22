@@ -17,16 +17,17 @@ export async function startIndexer(): Promise<void> {
   console.log(
     `⚡️[indexer]: Indexer started with sync interval: ${SYNC_INTERVAL}ms`
   );
+  await indexBookmarks();
   setInterval(async () => {
-    console.log(`⚡️[indexer]: Start syncing...`);
     await indexBookmarks();
-    console.log(`⚡️[indexer]: Syncing ended`);
   }, SYNC_INTERVAL);
 }
 
 export async function indexBookmarks(): Promise<void> {
+  console.log(`⚡️[indexer]: Start syncing...`);
   await indexPublicBookmarksCollections();
   await indexPublicBookmarks();
+  console.log(`⚡️[indexer]: Syncing ended`);
 }
 
 export async function indexPublicBookmarksCollections(): Promise<void> {

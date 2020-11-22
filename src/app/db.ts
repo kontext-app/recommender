@@ -33,7 +33,7 @@ export async function upsertUser(user: User): Promise<void> {
     { upsert: true }
   );
   console.log(
-    `⚡️[db] upsertUsers: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`
+    `⚡️[db] upsertUsers: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
   );
   return;
 }
@@ -64,7 +64,10 @@ export async function findAllBookmarksCollectionsOfDIDs(
   indexKey: string
 ): Promise<BookmarksCollection[]> {
   const collection = await db.collection('bookmarks_collection');
-  const cursor = await collection.find({ userDID: userDIDs, indexKey });
+  const cursor = await collection.find({
+    userDID: { $in: userDIDs },
+    indexKey,
+  });
   console.log(
     `⚡️[db] findAllBookmarksCollectionsOfDIDs: ${await cursor.count()} document(s) found`
   );
@@ -88,7 +91,7 @@ export async function upsertBookmarksCollection(
     { upsert: true }
   );
   console.log(
-    `⚡️[db] upsertBookmarksCollection: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`
+    `⚡️[db] upsertBookmarksCollection: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
   );
   return;
 }
@@ -132,7 +135,7 @@ export async function upsertBookmark(
     { upsert: true }
   );
   console.log(
-    `⚡️[db] upsertBookmark: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`
+    `⚡️[db] upsertBookmark: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
   );
   return;
 }
