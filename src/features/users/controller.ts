@@ -6,11 +6,11 @@ import { validate, throwValidationError } from 'app/utils/validate';
 
 import type { Request, Response } from 'express';
 
-type DIDBody = {
+export type DIDBody = {
   did: string;
 };
 
-const DIDBodySchema = {
+export const DIDBodySchema = {
   type: 'object',
   properties: {
     // TODO: add signature
