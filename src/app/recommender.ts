@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 import config from 'app/config';
 import bookmarksRouter from 'features/bookmarks/router';
@@ -10,6 +11,7 @@ const app = express();
 
 export function startRecommender(): void {
   app.use(morgan('dev'));
+  app.use(cors());
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());

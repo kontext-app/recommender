@@ -15,6 +15,7 @@ export async function connectMongoClient(): Promise<void> {
   console.log(`⚡️[db]: Connected to MongoDB at ${config.MONGO_DB_CONNECT}`);
 }
 
+//#region `users` collection
 type User = {
   did: string;
   recommendationsEnabled: boolean;
@@ -51,7 +52,9 @@ export async function findAllUserDIDsWithEnabledRecommendations(): Promise<
   );
   return (await cursor.toArray()).map((user) => user.did);
 }
+//#endregion
 
+//#region `bookmarks_collection` collection
 type BookmarksCollection = {
   docID: string;
   bookmarkDocIDs: Array<string>;
@@ -108,8 +111,10 @@ export async function insertManyBookmarksCollections(
   );
   return;
 }
+//#endregion
 
-type Bookmark = BookmarkDocContent & {
+//#region `bookmarks` collection
+export type Bookmark = BookmarkDocContent & {
   docID: string;
   numOfShares: number;
   upVotes: string[];
@@ -140,12 +145,25 @@ export async function upsertBookmark(
   return;
 }
 
-export async function findAllBookmarks(): Promise<Bookmark[]> {
+export async function findAllBookmarks(
+  filter: any = {},
+  sort: any = {}
+): Promise<Bookmark[]> {
   const collection = await db.collection('bookmarks');
-  const cursor = await collection.find({});
-  console.log(
-    `⚡️[db] findAllBookmarks: ${await cursor.count()} document(s) found`
-  );
+  const cursor = await collection.aggregate([
+    { $match: filter },
+    {
+      $addFields: {
+        totalNumVotes: {
+          $sum: [{ $size: '$upVotes' }, { $size: '$downVotes' }],
+        },
+      },
+    },
+    {
+      $sort: sort,
+    },
+  ]);
+  console.log(`⚡️[db] findAllBookmarks`);
   return await cursor.toArray();
 }
 
@@ -159,3 +177,4 @@ export async function insertManyBookmarks(
   );
   return;
 }
+//#endregion

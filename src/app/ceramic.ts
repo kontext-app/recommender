@@ -31,7 +31,11 @@ export function createIDX(): void {
 export async function getBookmarksIndexDocContentOfDID(
   did: string
 ): Promise<BookmarksIndexDocContent | null> {
-  return idx.get<BookmarksIndexDocContent>('BookmarksIndex', did);
+  const docContent = await idx.get<BookmarksIndexDocContent>(
+    'BookmarksIndex',
+    did
+  );
+  return docContent;
 }
 
 export async function getBookmarksIndexDocIDOfDID(
