@@ -121,6 +121,58 @@ export type Bookmark = BookmarkDocContent & {
   downVotes: string[];
 };
 
+export async function findBookmarkByDocID(docID: string): Promise<Bookmark> {
+  const collection = await db.collection('bookmarks');
+  const result = await collection.findOne({ docID });
+  console.log(`⚡️[db] findBookmarkByDocID`);
+  return result;
+}
+
+export async function upVoteBookmark(
+  docID: string,
+  voterDID: string
+): Promise<void> {
+  const collection = await db.collection('bookmarks');
+  const result = await collection.updateOne(
+    { docID },
+    {
+      $addToSet: { upVotes: voterDID },
+      $pull: { downVotes: { $in: [voterDID] } },
+    }
+  );
+  console.log(
+    `⚡️[db] upVoteBookmark: ${result.modifiedCount} document updated.`
+  );
+}
+
+export async function downVoteBookmark(
+  docID: string,
+  voterDID: string
+): Promise<void> {
+  const collection = await db.collection('bookmarks');
+  const result = await collection.updateOne(
+    { docID },
+    {
+      $addToSet: { downVotes: voterDID },
+      $pull: { upVotes: { $in: [voterDID] } },
+    }
+  );
+  console.log(
+    `⚡️[db] downVoteBookmark: ${result.modifiedCount} document updated.`
+  );
+}
+
+export async function incrementNumOfShares(docID: string): Promise<void> {
+  const collection = await db.collection('bookmarks');
+  const result = await collection.updateOne(
+    { docID },
+    { $inc: { numOfShares: 1 } }
+  );
+  console.log(
+    `⚡️[db] incrementNumOfShares: ${result.modifiedCount} document updated.`
+  );
+}
+
 export async function upsertBookmark(
   bookmark: Partial<Bookmark>
 ): Promise<void> {
