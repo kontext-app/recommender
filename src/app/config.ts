@@ -4,6 +4,7 @@ type EnvVars = {
   PORT: number;
   CERAMIC_API_HOST: string;
   MONGO_DB_CONNECT: string;
+  SYNC_INTERVAL: number;
 };
 
 const REQUIRED_ENV_VAR_KEYS = ['PORT', 'CERAMIC_API_HOST', 'MONGO_DB_CONNECT'];

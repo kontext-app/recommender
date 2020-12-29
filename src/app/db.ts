@@ -1,8 +1,9 @@
 import { Db, MongoClient } from 'mongodb';
 
 import config from 'app/config';
+import { logDB } from 'app/logger';
 
-import type { BookmarkDocContent } from 'app/types';
+import type { BookmarkDocContent } from 'kontext-common';
 
 export let mongoClient: MongoClient;
 export let db: Db;
@@ -12,7 +13,7 @@ export async function connectMongoClient(): Promise<void> {
     useUnifiedTopology: true,
   });
   db = mongoClient.db('indexer');
-  console.log(`⚡️[db]: Connected to MongoDB at ${config.MONGO_DB_CONNECT}`);
+  logDB(`Connected to MongoDB: ${config.MONGO_DB_CONNECT}`);
 }
 
 //#region `users` collection
@@ -33,8 +34,8 @@ export async function upsertUser(user: User): Promise<void> {
     },
     { upsert: true }
   );
-  console.log(
-    `⚡️[db] upsertUsers: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
+  logDB(
+    `upsertUsers: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
   );
   return;
 }
@@ -47,8 +48,8 @@ export async function findAllUserDIDsWithEnabledRecommendations(): Promise<
     { recommendationsEnabled: true },
     { projection: { did: 1 } }
   );
-  console.log(
-    `⚡️[db] findAllUserDIDsWithEnabledRecommendations: ${await cursor.count()} document(s) found`
+  logDB(
+    `findAllUserDIDsWithEnabledRecommendations: ${await cursor.count()} document(s) found`
   );
   return (await cursor.toArray()).map((user) => user.did);
 }
@@ -71,8 +72,8 @@ export async function findAllBookmarksCollectionsOfDIDs(
     userDID: { $in: userDIDs },
     indexKey,
   });
-  console.log(
-    `⚡️[db] findAllBookmarksCollectionsOfDIDs: ${await cursor.count()} document(s) found`
+  logDB(
+    `findAllBookmarksCollectionsOfDIDs: ${await cursor.count()} document(s) found`
   );
   return await cursor.toArray();
 }
@@ -93,8 +94,8 @@ export async function upsertBookmarksCollection(
     },
     { upsert: true }
   );
-  console.log(
-    `⚡️[db] upsertBookmarksCollection: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
+  logDB(
+    `upsertBookmarksCollection: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
   );
   return;
 }
@@ -106,8 +107,8 @@ export async function insertManyBookmarksCollections(
   const result = await collection.insertMany(bookmarksCollections, {
     ordered: true,
   });
-  console.log(
-    `⚡️[db] insertManyBookmarksCollections: ${result.insertedCount} document(s) inserted`
+  logDB(
+    `insertManyBookmarksCollections: ${result.insertedCount} document(s) inserted`
   );
   return;
 }
@@ -124,7 +125,7 @@ export type Bookmark = BookmarkDocContent & {
 export async function findBookmarkByDocID(docID: string): Promise<Bookmark> {
   const collection = await db.collection('bookmarks');
   const result = await collection.findOne({ docID });
-  console.log(`⚡️[db] findBookmarkByDocID`);
+  logDB(`findBookmarkByDocID`);
   return result;
 }
 
@@ -140,9 +141,7 @@ export async function upVoteBookmark(
       $pull: { downVotes: { $in: [voterDID] } },
     }
   );
-  console.log(
-    `⚡️[db] upVoteBookmark: ${result.modifiedCount} document updated.`
-  );
+  logDB(`upVoteBookmark: ${result.modifiedCount} document updated.`);
 }
 
 export async function downVoteBookmark(
@@ -157,9 +156,7 @@ export async function downVoteBookmark(
       $pull: { upVotes: { $in: [voterDID] } },
     }
   );
-  console.log(
-    `⚡️[db] downVoteBookmark: ${result.modifiedCount} document updated.`
-  );
+  logDB(`downVoteBookmark: ${result.modifiedCount} document updated.`);
 }
 
 export async function incrementNumOfShares(docID: string): Promise<void> {
@@ -168,9 +165,7 @@ export async function incrementNumOfShares(docID: string): Promise<void> {
     { docID },
     { $inc: { numOfShares: 1 } }
   );
-  console.log(
-    `⚡️[db] incrementNumOfShares: ${result.modifiedCount} document updated.`
-  );
+  logDB(`incrementNumOfShares: ${result.modifiedCount} document updated.`);
 }
 
 export async function upsertBookmark(
@@ -191,8 +186,8 @@ export async function upsertBookmark(
     },
     { upsert: true }
   );
-  console.log(
-    `⚡️[db] upsertBookmark: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
+  logDB(
+    `upsertBookmark: ${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount}, upserted ${result.upsertedCount} document(s)`
   );
   return;
 }
@@ -215,7 +210,7 @@ export async function findAllBookmarks(
       $sort: sort,
     },
   ]);
-  console.log(`⚡️[db] findAllBookmarks`);
+  logDB(`findAllBookmarks`);
   return await cursor.toArray();
 }
 
@@ -224,9 +219,7 @@ export async function insertManyBookmarks(
 ): Promise<void> {
   const collection = await db.collection('bookmarks');
   const result = await collection.insertMany(bookmarks, { ordered: true });
-  console.log(
-    `⚡️[db] insertManyBookmarks: ${result.insertedCount} document(s) inserted`
-  );
+  logDB(`insertManyBookmarks: ${result.insertedCount} document(s) inserted`);
   return;
 }
 //#endregion

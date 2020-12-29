@@ -1,5 +1,5 @@
 import {
-  createIDX,
+  initialize,
   getBookmarksCollectionByIndexKey,
   getBookmarkDocContentByDocID,
 } from 'app/ceramic';
@@ -9,14 +9,14 @@ import {
   upsertBookmarksCollection,
   upsertBookmark,
 } from 'app/db';
+import config from 'app/config';
+import { logIndexer } from 'app/logger';
 
-const SYNC_INTERVAL = 30000;
+const SYNC_INTERVAL = config.SYNC_INTERVAL || 30000;
 
 export async function startIndexer(): Promise<void> {
-  createIDX();
-  console.log(
-    `⚡️[indexer]: Indexer started with sync interval: ${SYNC_INTERVAL}ms`
-  );
+  initialize();
+  logIndexer(`Indexer started with sync interval: ${SYNC_INTERVAL}ms`);
   await indexBookmarks();
   setInterval(async () => {
     await indexBookmarks();
@@ -24,14 +24,15 @@ export async function startIndexer(): Promise<void> {
 }
 
 export async function indexBookmarks(): Promise<void> {
-  console.log(`⚡️[indexer]: Start syncing...`);
+  logIndexer(`Start syncing...`);
   await indexPublicBookmarksCollections();
   await indexPublicBookmarks();
-  console.log(`⚡️[indexer]: Syncing ended`);
+  logIndexer(`Syncing ended`);
 }
 
 export async function indexPublicBookmarksCollections(): Promise<void> {
   const dids = await findAllUserDIDsWithEnabledRecommendations();
+  logIndexer(`Indexing public bookmark collections of ${dids.length} dids`);
 
   const allPublicBookmarksCollections = (
     await Promise.all(

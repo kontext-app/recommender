@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import config from 'app/config';
+import { logRecommender } from 'app/logger';
 import bookmarksRouter from 'features/bookmarks/router';
 import usersRouter from 'features/users/router';
 
@@ -20,8 +21,8 @@ export function startRecommender(): void {
   app.use('/api/v1/users', usersRouter);
 
   app.listen(config.PORT, () => {
-    console.log(
-      `⚡️[recommender]: Recommender service is running at https://localhost:${config.PORT}`
+    logRecommender(
+      `Recommender service is running at https://localhost:${config.PORT}`
     );
   });
 }
