@@ -1,116 +1,74 @@
-import { IDX } from '@ceramicstudio/idx';
-import { definitions, schemas } from '@ceramicstudio/idx-constants';
-import CeramicClient from '@ceramicnetwork/ceramic-http-client';
+import { apis } from 'kontext-common';
 
-import {
-  PUBLISHED_DEFINITIONS,
-  PUBLISHED_SCHEMAS,
-} from 'app/constants/definitions';
 import config from 'app/config';
-import {
-  DefaultBookmarksIndexKeys,
-  DefaultBookmarksIndexKeyType,
-} from 'app/constants/bookmarks';
 
-import type { BookmarksIndexDocContent, BookmarkDocContent } from 'app/types';
+import type { IDX } from '@ceramicstudio/idx';
+import type { CeramicApi } from '@ceramicnetwork/common';
+import type {
+  BookmarksIndexDocContent,
+  BookmarkDocContent,
+  DefaultBookmarksIndexKey,
+} from 'kontext-common';
 
-export const ceramic = new CeramicClient(config.CERAMIC_API_HOST);
+let idx: IDX;
+let ceramic: CeramicApi;
 
-export let idx: IDX;
-
-export function createIDX(): void {
-  idx = new IDX({
-    ceramic,
-    definitions: {
-      ...definitions,
-      ...PUBLISHED_DEFINITIONS,
-    },
-  });
+function initializeCeramic(): void {
+  // @ts-ignore
+  ceramic = apis.ceramic.createCeramic(config.CERAMIC_API_HOST);
 }
 
-export async function getBookmarksIndexDocContentOfDID(
+function initializeIDX(ceramic: CeramicApi): void {
+  idx = apis.idx.createIDX(ceramic);
+}
+
+export function initialize(): void {
+  initializeCeramic();
+  initializeIDX(ceramic);
+}
+
+export async function getBookmarksIndexDocContent(
   did: string
 ): Promise<BookmarksIndexDocContent | null> {
-  const docContent = await idx.get<BookmarksIndexDocContent>(
-    'BookmarksIndex',
-    did
-  );
-  return docContent;
+  return apis.bookmarks.getBookmarksIndexDocContent(idx, did);
 }
 
-export async function getBookmarksIndexDocIDOfDID(
+export async function getBookmarksIndexDocID(
   did: string
 ): Promise<string | null> {
-  const idxDocContent = await idx.getIDXContent(did);
-
-  if (!idxDocContent) {
-    return null;
-  }
-
-  const bookmarksIndexDocID =
-    idxDocContent[PUBLISHED_DEFINITIONS.BookmarksIndex];
-  return bookmarksIndexDocID;
+  return apis.bookmarks.getBookmarksIndexDocID(idx, did);
 }
 
-export async function getBookmarksCollectionDocIDByIndexKeyOfDID(
+export async function getBookmarksDocIDByIndexKey(
   did: string,
-  indexKey: DefaultBookmarksIndexKeyType
+  indexKey: DefaultBookmarksIndexKey
 ): Promise<string | null> {
-  const bookmarksIndexDocContent = await getBookmarksIndexDocContentOfDID(did);
-
-  if (!bookmarksIndexDocContent) {
-    return null;
-  }
-
-  return bookmarksIndexDocContent[indexKey];
+  return apis.bookmarks.getBookmarksDocIDByIndexKey(idx, { indexKey, did });
 }
 
 export async function getBookmarksCollectionDocContent(
   docID: string
 ): Promise<Array<string>> {
-  const bookmarksCollectionDoc = await ceramic.loadDocument(docID);
-
-  await ceramic.close();
-
-  return bookmarksCollectionDoc.content;
+  return apis.bookmarks.getBookmarksDocContent(idx, docID);
 }
 
 export async function getBookmarksCollectionByIndexKey(
   did: string,
-  indexKey: DefaultBookmarksIndexKeyType
+  indexKey: DefaultBookmarksIndexKey
 ): Promise<{
   userDID: string;
   indexKey: string;
   bookmarkDocIDs: string[];
   docID: string;
 } | null> {
-  const bookmarksCollectionDocID = await getBookmarksCollectionDocIDByIndexKeyOfDID(
+  return apis.bookmarks.getBookmarksOfCollectionByIndexKey(idx, {
     did,
-    indexKey
-  );
-
-  if (!bookmarksCollectionDocID) {
-    return null;
-  }
-
-  const bookmarkDocIDs = await getBookmarksCollectionDocContent(
-    bookmarksCollectionDocID
-  );
-
-  return {
-    userDID: did,
     indexKey,
-    bookmarkDocIDs,
-    docID: bookmarksCollectionDocID,
-  };
+  });
 }
 
 export async function getBookmarkDocContentByDocID(
   docID: string
 ): Promise<BookmarkDocContent> {
-  const bookmarkDoc = await ceramic.loadDocument(docID);
-
-  await ceramic.close();
-
-  return bookmarkDoc.content;
+  return apis.bookmarks.getBookmarkDocContent(idx, docID);
 }
