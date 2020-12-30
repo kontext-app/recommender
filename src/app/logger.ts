@@ -8,7 +8,7 @@ export const logRecommender = makeLogger(chalk.yellow('[recomm]'));
 
 function makeLogger(prefix: string) {
   function logger(message: string) {
-    return console.log(prefix.padEnd(20, ' ') + message);
+    return console.log(prefix.padEnd(10, ' ') + message);
   }
   return logger;
 }
