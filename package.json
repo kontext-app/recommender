@@ -17,7 +17,7 @@
     "morgan": "^1.10.0"
   },
   "scripts": {
-    "start": "tsc && NODE_PATH=./dist/src node build/src/app.js",
+    "start": "tsc && NODE_PATH=./build node build/app.js",
     "dev": "NODE_PATH=./src nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts"
   },
   "devDependencies": {
