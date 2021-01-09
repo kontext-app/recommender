@@ -18,7 +18,7 @@
     "@polkadot/util-crypto" "^3.6.1"
     "@smontero/eosio-signing-tools" "0.0.6"
 
-"3id-connect@^1.0.0-alpha.8":
+"3id-connect@^1.0.0-alpha.9":
   version "1.0.0-alpha.9"
   resolved "https://registry.yarnpkg.com/3id-connect/-/3id-connect-1.0.0-alpha.9.tgz#83af14ad087b978d57201e21bb8df5af184c57fb"
   integrity sha512-vx+2oPwaV1bwk6gsghvWV5ghrIkROxN1RXsR1+cMyb77Asd6Eojo9t6ko55sgV8t3Bp8v+QmBBsQqkCFC3Hwvw==
@@ -95,13 +95,24 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@ceramicnetwork/3id-did-resolver@^0.6.0", "@ceramicnetwork/3id-did-resolver@^0.6.1":
+"@ceramicnetwork/3id-did-resolver@^0.6.1":
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/@ceramicnetwork/3id-did-resolver/-/3id-did-resolver-0.6.1.tgz#2f20dcb6530487db27d968a737f3cc9e4a55c334"
   integrity sha512-GrqkZLvfhh9aCWLvPzWPMQL1QEaaqFJAG6YhHaJawBgLt7CDn2I0BT5KeJPc5CQVw/LXe6dB1kl/FgqGLp0c4w==
   dependencies:
     "@ceramicnetwork/common" "^0.15.1"
     "@ceramicnetwork/docid" "^0.4.1"
+    cids "1.0.2"
+    cross-fetch "^3.0.6"
+    uint8arrays "^1.1.0"
+
+"@ceramicnetwork/3id-did-resolver@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/3id-did-resolver/-/3id-did-resolver-0.6.4.tgz#308666cc40d4d2a05f9b9d842603075173e85587"
+  integrity sha512-GCzOrBJoMDpAby/xeSN9APOm2+CSIUmzjNXNoyowJrLktxcuw0glr57d2CxXA7tY9zyshqAyuQHSRAJTBYsbCA==
+  dependencies:
+    "@ceramicnetwork/common" "^0.15.4"
+    "@ceramicnetwork/docid" "^0.4.2"
     cids "1.0.2"
     cross-fetch "^3.0.6"
     uint8arrays "^1.1.0"
@@ -120,10 +131,36 @@
     loglevel-plugin-prefix "^0.8.4"
     uint8arrays "^1.1.0"
 
+"@ceramicnetwork/common@^0.15.4":
+  version "0.15.4"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/common/-/common-0.15.4.tgz#82d5a1937fb7e19608512c843a8ee9bab90d6cf7"
+  integrity sha512-YJ8WfIJ90hkGQMYQ/aqkNdw9XqQpVhD+iXw3EyG0vcbKrsczW0qP2tga8XLE5Gsms1j7Y2hKxBMTvQRxKNXPBQ==
+  dependencies:
+    "@ceramicnetwork/docid" "^0.4.2"
+    cids "1.0.2"
+    dag-jose "^0.3.0"
+    did-resolver "^2.1.1"
+    lodash.clonedeep "^4.5.0"
+    loglevel "^1.7.0"
+    loglevel-plugin-prefix "^0.8.4"
+    lru_map "^0.4.1"
+    uint8arrays "^1.1.0"
+
 "@ceramicnetwork/docid@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@ceramicnetwork/docid/-/docid-0.4.1.tgz#57d4ad1881cd772fe0410e1b927490c8f803bd8b"
   integrity sha512-C2VMyTx4KeKIsdBTFCLJggaoPGCQZkM74qwshFCkI5ZoWPKTZt+Tc1SfDo046R4qu0lUzwDpBYIbeW8vFbJbCQ==
+  dependencies:
+    cids "1.0.2"
+    multibase "3.0.1"
+    multicodec "2.0.4"
+    uint8arrays "^1.1.0"
+    varint "^6.0.0"
+
+"@ceramicnetwork/docid@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/docid/-/docid-0.4.2.tgz#7ae3381fb93c2b3c2873f8b5bef5aa5c60162822"
+  integrity sha512-DayRhecRYj2fB+FzqgEhBZWS2lbrplZWhGK/+j9yOHo/NXea/zfsounLpF23V/nWylVuDDOsg147aPNrlpzlmw==
   dependencies:
     cids "1.0.2"
     multibase "3.0.1"
@@ -138,6 +175,16 @@
   dependencies:
     "3id-blockchain-utils" "^1.1.0"
     "@ceramicnetwork/common" "^0.15.1"
+    "@types/lodash.clonedeep" "^4.5.6"
+    cids "1.0.2"
+
+"@ceramicnetwork/doctype-caip10-link@^0.12.6":
+  version "0.12.6"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/doctype-caip10-link/-/doctype-caip10-link-0.12.6.tgz#d3e993e249e6ea5887babc8a620912f12371d116"
+  integrity sha512-3p+MA4Mki+bL9ZMFMro3nhy+13hUkrcFdg8SzJzvQhPlkoig3DBh87FWUtjDsGfNQZXAHCa6ig3zIGs3OFAX3g==
+  dependencies:
+    "3id-blockchain-utils" "^1.1.0"
+    "@ceramicnetwork/common" "^0.15.4"
     "@types/lodash.clonedeep" "^4.5.6"
     cids "1.0.2"
 
@@ -158,6 +205,40 @@
     dids "^1.1.0"
     fast-json-patch "^2.2.1"
     fast-json-stable-stringify "^2.1.0"
+
+"@ceramicnetwork/doctype-tile@^0.12.8":
+  version "0.12.8"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/doctype-tile/-/doctype-tile-0.12.8.tgz#408952ee605d0bf8946087237a196f5fbdd022c7"
+  integrity sha512-VmZ8nNC/u4uRdv0EQEFM6VfMIXoucc06UfruA/xlwFiWt16IzYAj5BrbeZK2YmwGv8RUspSwqB8q/jtAq6rx+A==
+  dependencies:
+    "@ceramicnetwork/common" "^0.15.4"
+    "@ethersproject/base64" "^5.0.2"
+    "@ethersproject/random" "^5.0.2"
+    "@types/lodash.clonedeep" "^4.5.6"
+    base64url "^3.0.1"
+    cids "1.0.2"
+    did-jwt "^4.6.3"
+    did-resolver "^2.1.1"
+    dids "^1.1.0"
+    fast-json-patch "^2.2.1"
+    fast-json-stable-stringify "^2.1.0"
+
+"@ceramicnetwork/http-client@^0.8.12":
+  version "0.8.12"
+  resolved "https://registry.yarnpkg.com/@ceramicnetwork/http-client/-/http-client-0.8.12.tgz#fc074ede23189f0ca5bd862bdc989f7c5ce8ead6"
+  integrity sha512-Wiso/5me154nXTKPEL8jRCcvTdRBzjZr/P/oQnhNo0NgxAx6I+jw3npnK7g8nMLXtSKiXXxuTBRdHuvoIObaIQ==
+  dependencies:
+    "@ceramicnetwork/3id-did-resolver" "^0.6.4"
+    "@ceramicnetwork/common" "^0.15.4"
+    "@ceramicnetwork/docid" "^0.4.2"
+    "@ceramicnetwork/doctype-caip10-link" "^0.12.6"
+    "@ceramicnetwork/doctype-tile" "^0.12.8"
+    cids "1.0.2"
+    cross-fetch "^3.0.6"
+    did-resolver "^2.1.1"
+    dids "^1.1.0"
+    key-did-resolver "^0.2.4"
+    lodash.clonedeep "^4.5.0"
 
 "@ceramicnetwork/http-client@^0.8.8":
   version "0.8.9"
@@ -207,6 +288,14 @@
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/@ceramicstudio/idx/-/idx-0.5.1.tgz#f896ab1344d1f1a1abf16c202a02558752f41ae1"
   integrity sha512-kRj4HjJu9j4R22f5shvvkW1kBfRBOebSMIJNlkpDAMlXPnsHLHHO9YUeR0OU15LVw0lf5fmhAZ2DuX5E8gCKqA==
+  dependencies:
+    "@ceramicstudio/idx-constants" "^0.5.1"
+    dataloader "^2.0.0"
+
+"@ceramicstudio/idx@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@ceramicstudio/idx/-/idx-0.5.2.tgz#0ffb1686195e7bae91684f7a405f7f4a90fc997c"
+  integrity sha512-sPDXzwpAga8l03ZjVOZq62ODblMuEPEX+5Tg5yvLqreTiNSyblM5obwkycRqTdQzYBPxPnN6hb7LB8e71BxxgQ==
   dependencies:
     "@ceramicstudio/idx-constants" "^0.5.1"
     dataloader "^2.0.0"
@@ -2626,6 +2715,16 @@ json-text-sequence@~0.1.0:
   dependencies:
     delimit-stream "0.1.0"
 
+key-did-resolver@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/key-did-resolver/-/key-did-resolver-0.2.4.tgz#5bde6771674e8c288f142a4a0676854b77d587c5"
+  integrity sha512-/dtq2eHKavlPZKpx5vdBW+vHN7nY4kMCAlg1FzeNqwLT9kYvuQQezSZgW6DDJDR2QZUaHT9MG4dvB8K18wj+6A==
+  dependencies:
+    "@stablelib/ed25519" "^1.0.1"
+    multibase "3.0.1"
+    uint8arrays "^1.1.0"
+    varint "^6.0.0"
+
 keyv@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-3.1.0.tgz#ecc228486f69991e49e9476485a5be1e8fc5c4d9"
@@ -2633,16 +2732,16 @@ keyv@^3.0.0:
   dependencies:
     json-buffer "3.0.0"
 
-kontext-common@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/kontext-common/-/kontext-common-1.6.0.tgz#1da9df228badccf4f1cb7c54e37bf358ef682f8a"
-  integrity sha512-B46eSS9QO8D+Sza7EPZEbgA7KsUKejw198qDuzC/7yigGE8uyohAABNzRP+S+QlW9LRpXFK2dNsp57rJun8Xsg==
+kontext-common@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/kontext-common/-/kontext-common-1.11.0.tgz#b7c28bd19143dfe870dd79d37e4f210939ebd7ff"
+  integrity sha512-4jmVXrb/KtjmcUexnqQVjiRUtQwC8Wz7zvhROQMgFKMsBvp/RyS9LZbU7Fr2Ud9OgdhSXRg3vxL+CyS9BaLiGg==
   dependencies:
-    "3id-connect" "^1.0.0-alpha.8"
+    "3id-connect" "^1.0.0-alpha.9"
     "3id-did-provider" "^0.2.0"
-    "@ceramicnetwork/3id-did-resolver" "^0.6.0"
-    "@ceramicnetwork/http-client" "^0.8.8"
-    "@ceramicstudio/idx" "^0.5.0"
+    "@ceramicnetwork/3id-did-resolver" "^0.6.4"
+    "@ceramicnetwork/http-client" "^0.8.12"
+    "@ceramicstudio/idx" "^0.5.2"
     "@ceramicstudio/idx-constants" "^0.5.1"
     "@ceramicstudio/idx-tools" "^0.5.0"
     dids "^1.1.1"
@@ -2706,6 +2805,11 @@ lowercase-keys@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-2.0.0.tgz#2603e78b7b4b0006cbca2fbcc8a3202558ac9479"
   integrity sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==
+
+lru_map@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/lru_map/-/lru_map-0.4.1.tgz#f7b4046283c79fb7370c36f8fca6aee4324b0a98"
+  integrity sha512-I+lBvqMMFfqaV8CJCISjI3wbjmwVu/VyOoU7+qtu9d7ioW5klMgsTTiUOUp+DJvfTTzKXoPbyC6YfgkNcyPSOg==
 
 make-dir@^3.0.0:
   version "3.1.0"
