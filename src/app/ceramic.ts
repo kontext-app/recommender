@@ -1,4 +1,4 @@
-import { apis } from 'kontext-common';
+import { apis, RatingDocContent, RatingsIndexDocContent } from 'kontext-common';
 
 import config from 'app/config';
 
@@ -19,6 +19,7 @@ function initializeCeramic(): void {
 }
 
 function initializeIDX(ceramic: CeramicApi): void {
+  // @ts-ignore
   idx = apis.idx.createIDX(ceramic);
 }
 
@@ -72,3 +73,35 @@ export async function getBookmarkDocContentByDocID(
 ): Promise<BookmarkDocContent> {
   return apis.bookmarks.getBookmarkDocContent(idx, docID);
 }
+
+//#region 'Ratings'
+
+export async function getRatingDocIDsOfIndexKey(
+  indexKey: string,
+  did: string
+): Promise<string[] | null> {
+  const ratingsIndexDocContent = await apis.ratings.getRatingsIndexDocContent(
+    idx,
+    did
+  );
+
+  if (!ratingsIndexDocContent) {
+    return null;
+  }
+
+  const ratingDocIDs = ratingsIndexDocContent[indexKey];
+
+  if (!ratingDocIDs) {
+    return null;
+  }
+
+  return ratingDocIDs;
+}
+
+export async function getRatingDocContent(
+  docID: string
+): Promise<RatingDocContent> {
+  return apis.ratings.getRatingDocContent(idx, docID);
+}
+
+//#endregion 'Ratings'

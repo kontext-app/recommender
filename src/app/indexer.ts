@@ -2,12 +2,16 @@ import {
   initialize,
   getBookmarksCollectionByIndexKey,
   getBookmarkDocContentByDocID,
+  getRatingDocIDsOfIndexKey,
+  getRatingDocContent,
 } from 'app/ceramic';
 import {
   findAllUserDIDsWithEnabledRecommendations,
   findAllBookmarksCollectionsOfDIDs,
   upsertBookmarksCollection,
   upsertBookmark,
+  upVoteBookmark,
+  downVoteBookmark,
 } from 'app/db';
 import config from 'app/config';
 import { logIndexer } from 'app/logger';
@@ -21,6 +25,79 @@ export async function startIndexer(): Promise<void> {
   setInterval(async () => {
     await indexBookmarks();
   }, SYNC_INTERVAL);
+}
+
+export async function indexPublicBookmarkRatings(): Promise<void> {
+  const dids = await findAllUserDIDsWithEnabledRecommendations();
+  logIndexer(`Indexing public ratings of ${dids.length} dids`);
+
+  const ratingDocIDs = await Promise.all(
+    dids.map((did) => getRatingDocIDsOfIndexKey('bookmarks', did))
+  );
+  const flattenedRatingDocIDs = ratingDocIDs
+    .flat()
+    .filter(
+      (ratingDocID): ratingDocID is string => typeof ratingDocID === 'string'
+    );
+
+  const ratingDocContents = await Promise.all(
+    flattenedRatingDocIDs.map((ratingDocID) => getRatingDocContent(ratingDocID))
+  );
+
+  const bookmarkDocIDToVotesMap = ratingDocContents.reduce(
+    (
+      map: {
+        [bookmarkDocID: string]: {
+          upVotedDIDs: string[];
+          downVotedDIDs: string[];
+        };
+      },
+      ratingDocContent
+    ) => {
+      const { ratedDocId, rating, author } = ratingDocContent;
+
+      const { upVotedDIDs = [], downVotedDIDs = [] } = map[ratedDocId] || {};
+
+      if (rating === 1) {
+        return {
+          ...map,
+          [ratedDocId]: {
+            upVotedDIDs: [...upVotedDIDs, author],
+            downVotedDIDs,
+          },
+        };
+      }
+
+      if (rating === -1) {
+        return {
+          ...map,
+          [ratedDocId]: {
+            downVotedDIDs: [...downVotedDIDs, author],
+            upVotedDIDs,
+          },
+        };
+      }
+
+      return map;
+    },
+    {}
+  );
+
+  // bulk up vote
+  await Promise.all(
+    Object.entries(bookmarkDocIDToVotesMap).map((entries) => {
+      const [bookmarkDocID, votes] = entries;
+      return upVoteBookmark(bookmarkDocID, votes.upVotedDIDs);
+    })
+  );
+
+  // bulk down vote
+  await Promise.all(
+    Object.entries(bookmarkDocIDToVotesMap).map((entries) => {
+      const [bookmarkDocID, votes] = entries;
+      return downVoteBookmark(bookmarkDocID, votes.downVotedDIDs);
+    })
+  );
 }
 
 export async function indexBookmarks(): Promise<void> {

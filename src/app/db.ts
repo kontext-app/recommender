@@ -131,14 +131,15 @@ export async function findBookmarkByDocID(docID: string): Promise<Bookmark> {
 
 export async function upVoteBookmark(
   docID: string,
-  voterDID: string
+  voterDIDs: string | string[]
 ): Promise<void> {
   const collection = await db.collection('bookmarks');
+  const dids = typeof voterDIDs === 'string' ? [voterDIDs] : voterDIDs;
   const result = await collection.updateOne(
     { docID },
     {
-      $addToSet: { upVotes: voterDID },
-      $pull: { downVotes: { $in: [voterDID] } },
+      $addToSet: { upVotes: { $each: dids } },
+      $pull: { downVotes: { $in: dids } },
     }
   );
   logDB(`upVoteBookmark: ${result.modifiedCount} document updated.`);
@@ -146,14 +147,15 @@ export async function upVoteBookmark(
 
 export async function downVoteBookmark(
   docID: string,
-  voterDID: string
+  voterDIDs: string | string[]
 ): Promise<void> {
   const collection = await db.collection('bookmarks');
+  const dids = typeof voterDIDs === 'string' ? [voterDIDs] : voterDIDs;
   const result = await collection.updateOne(
     { docID },
     {
-      $addToSet: { downVotes: voterDID },
-      $pull: { upVotes: { $in: [voterDID] } },
+      $addToSet: { downVotes: { $each: dids } },
+      $pull: { upVotes: { $in: dids } },
     }
   );
   logDB(`downVoteBookmark: ${result.modifiedCount} document updated.`);
