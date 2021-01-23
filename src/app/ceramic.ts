@@ -1,4 +1,4 @@
-import { apis, RatingDocContent, RatingsIndexDocContent } from 'kontext-common';
+import { apis, RatingDocContent } from 'kontext-common';
 
 import config from 'app/config';
 
@@ -15,7 +15,10 @@ let ceramic: CeramicApi;
 
 function initializeCeramic(): void {
   // @ts-ignore
-  ceramic = apis.ceramic.createCeramic(config.CERAMIC_API_HOST);
+  ceramic = apis.ceramic.createCeramic(config.CERAMIC_API_HOST, {
+    docSyncEnabled: true,
+    docSyncInterval: config.SYNC_INTERVAL,
+  });
 }
 
 function initializeIDX(ceramic: CeramicApi): void {

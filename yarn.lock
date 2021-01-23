@@ -2878,10 +2878,10 @@ keyv@^3.0.0:
   dependencies:
     json-buffer "3.0.0"
 
-kontext-common@^1.13.0:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/kontext-common/-/kontext-common-1.13.0.tgz#d58536cbd5b1ad68102f6427e70b3b3837556ef6"
-  integrity sha512-wf/P+iatjC/x/fzygixGZwEJtGQnJY1p7dAb+szpUEh38C9s3O97dRtTszWhTCZIu/Ml4LAe4veWrD0/h5mUTQ==
+kontext-common@^1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/kontext-common/-/kontext-common-1.15.0.tgz#659d738cf186adf12cb19c1d14f14faf6008cfab"
+  integrity sha512-CwyL+YlcKXL8ACNmtJzxzDlq6n6EsTsHXE5vBXJMAS/qm2bqHDwhAZXLWdxQvNErKLoAoye5KiYwgbf7deZFDg==
   dependencies:
     "3id-connect" "^1.0.0-alpha.15"
     "3id-did-provider" "^0.5.0"
