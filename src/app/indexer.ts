@@ -20,11 +20,21 @@ const SYNC_INTERVAL = config.SYNC_INTERVAL || 30000;
 
 export async function startIndexer(): Promise<void> {
   initialize();
-  logIndexer(`Indexer started with sync interval: ${SYNC_INTERVAL}ms`);
-  await indexBookmarks();
+  logIndexer(`Indexer started with sync interval: ${SYNC_INTERVAL}ms\n`);
+  await indexPublicBookmarksAndRatings();
+  indexPublicBookmarkRatings;
   setInterval(async () => {
-    await indexBookmarks();
+    await indexPublicBookmarksAndRatings();
   }, SYNC_INTERVAL);
+}
+
+async function indexPublicBookmarksAndRatings(): Promise<void> {
+  logIndexer(`Start indexing Bookmarks...`);
+  await indexBookmarks();
+  logIndexer(`Ended indexing Bookmarks.\n`);
+  logIndexer(`Start indexing Ratings...`);
+  await indexPublicBookmarkRatings();
+  logIndexer(`Ended indexing Ratings.\n`);
 }
 
 export async function indexPublicBookmarkRatings(): Promise<void> {
@@ -101,10 +111,8 @@ export async function indexPublicBookmarkRatings(): Promise<void> {
 }
 
 export async function indexBookmarks(): Promise<void> {
-  logIndexer(`Start syncing...`);
   await indexPublicBookmarksCollections();
   await indexPublicBookmarks();
-  logIndexer(`Syncing ended`);
 }
 
 export async function indexPublicBookmarksCollections(): Promise<void> {
