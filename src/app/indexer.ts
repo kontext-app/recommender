@@ -21,11 +21,12 @@ const SYNC_INTERVAL = config.SYNC_INTERVAL || 30000;
 export async function startIndexer(): Promise<void> {
   initialize();
   logIndexer(`Indexer started with sync interval: ${SYNC_INTERVAL}ms\n`);
+  await indexPublicBookmarksAndRatingsInterval();
+}
+
+async function indexPublicBookmarksAndRatingsInterval() {
   await indexPublicBookmarksAndRatings();
-  indexPublicBookmarkRatings;
-  setInterval(async () => {
-    await indexPublicBookmarksAndRatings();
-  }, SYNC_INTERVAL);
+  setTimeout(indexPublicBookmarksAndRatingsInterval, SYNC_INTERVAL);
 }
 
 async function indexPublicBookmarksAndRatings(): Promise<void> {
