@@ -1,166 +1,123 @@
-import {
-  initialize,
-  getBookmarksCollectionByIndexKey,
-  getBookmarkDocContentByDocID,
-  getRatingDocIDsOfIndexKey,
-  getRatingDocContent,
-} from 'app/ceramic';
-import {
-  findAllUserDIDsWithEnabledRecommendations,
-  findAllBookmarksCollectionsOfDIDs,
-  upsertBookmarksCollection,
-  upsertBookmark,
-  upVoteBookmark,
-  downVoteBookmark,
-} from 'app/db';
+import { utils } from 'ethers';
+import { definitions, enums } from 'kontext-common';
+
+import * as ceramic from 'app/ceramic';
+import * as db from 'app/db';
 import config from 'app/config';
 import { logIndexer } from 'app/logger';
 
-const SYNC_INTERVAL = config.SYNC_INTERVAL || 30000;
+import * as bookmarksIndexer from 'features/bookmarks/indexer';
+import * as ratingsIndexer from 'features/ratings/indexer';
+
+import type { Doctype } from '@ceramicnetwork/common';
+
+const indexDocIDToPrevLogsLength: {
+  [indexDocID: string]: number;
+} = {};
 
 export async function startIndexer(): Promise<void> {
-  initialize();
-  logIndexer(`Indexer started with sync interval: ${SYNC_INTERVAL}ms\n`);
-  await indexPublicBookmarksAndRatingsInterval();
-}
-
-async function indexPublicBookmarksAndRatingsInterval() {
-  await indexPublicBookmarksAndRatings();
-  setTimeout(indexPublicBookmarksAndRatingsInterval, SYNC_INTERVAL);
-}
-
-async function indexPublicBookmarksAndRatings(): Promise<void> {
-  logIndexer(`Start indexing Bookmarks...`);
-  await indexBookmarks();
-  logIndexer(`Ended indexing Bookmarks.\n`);
-  logIndexer(`Start indexing Ratings...`);
-  await indexPublicBookmarkRatings();
-  logIndexer(`Ended indexing Ratings.\n`);
-}
-
-export async function indexPublicBookmarkRatings(): Promise<void> {
-  const dids = await findAllUserDIDsWithEnabledRecommendations();
-  logIndexer(`Indexing public ratings of ${dids.length} dids`);
-
-  const ratingDocIDs = await Promise.all(
-    dids.map((did) => getRatingDocIDsOfIndexKey('bookmarks', did))
+  logIndexer(
+    `Starting indexer with doc sync interval ${config.SYNC_INTERVAL} ms`
   );
-  const flattenedRatingDocIDs = ratingDocIDs
-    .flat()
-    .filter(
-      (ratingDocID): ratingDocID is string => typeof ratingDocID === 'string'
+
+  await initializeIndexerIDX();
+
+  await setIndexDocsListeners();
+  setInterval(() => {
+    setIndexDocsListeners();
+  }, config.SYNC_INTERVAL * 5);
+
+  setInterval(() => {
+    logIndexer(
+      "Update index key 'bookmarks' of AggregatedRatings with new scores..."
     );
-
-  const ratingDocContents = await Promise.all(
-    flattenedRatingDocIDs.map((ratingDocID) => getRatingDocContent(ratingDocID))
-  );
-
-  const bookmarkDocIDToVotesMap = ratingDocContents.reduce(
-    (
-      map: {
-        [bookmarkDocID: string]: {
-          upVotedDIDs: string[];
-          downVotedDIDs: string[];
-        };
-      },
-      ratingDocContent
-    ) => {
-      const { ratedDocId, rating, author } = ratingDocContent;
-
-      const { upVotedDIDs = [], downVotedDIDs = [] } = map[ratedDocId] || {};
-
-      if (rating === 1) {
-        return {
-          ...map,
-          [ratedDocId]: {
-            upVotedDIDs: [...upVotedDIDs, author],
-            downVotedDIDs,
-          },
-        };
-      }
-
-      if (rating === -1) {
-        return {
-          ...map,
-          [ratedDocId]: {
-            downVotedDIDs: [...downVotedDIDs, author],
-            upVotedDIDs,
-          },
-        };
-      }
-
-      return map;
-    },
-    {}
-  );
-
-  // bulk up vote
-  await Promise.all(
-    Object.entries(bookmarkDocIDToVotesMap).map((entries) => {
-      const [bookmarkDocID, votes] = entries;
-      return upVoteBookmark(bookmarkDocID, votes.upVotedDIDs);
-    })
-  );
-
-  // bulk down vote
-  await Promise.all(
-    Object.entries(bookmarkDocIDToVotesMap).map((entries) => {
-      const [bookmarkDocID, votes] = entries;
-      return downVoteBookmark(bookmarkDocID, votes.downVotedDIDs);
-    })
-  );
-}
-
-export async function indexBookmarks(): Promise<void> {
-  await indexPublicBookmarksCollections();
-  await indexPublicBookmarks();
-}
-
-export async function indexPublicBookmarksCollections(): Promise<void> {
-  const dids = await findAllUserDIDsWithEnabledRecommendations();
-  logIndexer(`Indexing public bookmark collections of ${dids.length} dids`);
-
-  const allPublicBookmarksCollections = (
-    await Promise.all(
-      dids.map((did) => getBookmarksCollectionByIndexKey(did, 'public'))
-    )
-  ).filter(
-    (
-      collection
-    ): collection is {
-      userDID: string;
-      indexKey: string;
-      bookmarkDocIDs: string[];
-      docID: string;
-    } => !!collection
-  );
-
-  await Promise.all(
-    allPublicBookmarksCollections.map((bookmarksCollection) =>
-      upsertBookmarksCollection(bookmarksCollection)
-    )
-  );
-}
-
-export async function indexPublicBookmarks(): Promise<void> {
-  const dids = await findAllUserDIDsWithEnabledRecommendations();
-  const allIndexedPublicBookmarksCollections = await findAllBookmarksCollectionsOfDIDs(
-    dids,
-    'public'
-  );
-
-  for (const indexedPublicBookmarksCollection of allIndexedPublicBookmarksCollections) {
-    const { bookmarkDocIDs } = indexedPublicBookmarksCollection;
-    const bookmarks = await Promise.all(
-      bookmarkDocIDs.map((docID) => getBookmarkDocContentByDocID(docID))
+    ratingsIndexer.updateAggregatedRatingsOfIndexKeyWithNewScores(
+      enums.DefaultAggregatedRatingsIndexKeys.BOOKMARKS
     );
-    await Promise.all(
-      bookmarks.map((bookmark, index) =>
-        upsertBookmark({
-          ...bookmark,
-          docID: bookmarkDocIDs[index],
-        })
-      )
+    logIndexer(
+      "Index key 'bookmarks' of AggregatedRatings updated with new scores"
     );
+  }, config.SYNC_INTERVAL * 10);
+}
+
+export async function initializeIndexerIDX(): Promise<void> {
+  logIndexer('Initialize Indexer IDX...');
+
+  ceramic.initialize();
+  logIndexer(`Initialize Ceramic and IDX`);
+
+  await ceramic.authenticateWithSeed(utils.arrayify(config.THREE_ID_SEED));
+  logIndexer(`Authenticate IDX with seed of indexer`);
+
+  const [hasAggregatedRatingsIndex, hasCuratedDocsIndex] = await Promise.all([
+    ceramic.hasAggregatedRatingsIndex(),
+    ceramic.hasCuratedDocsIndex(),
+  ]);
+
+  if (!hasAggregatedRatingsIndex || !hasCuratedDocsIndex) {
+    await Promise.all([
+      ceramic.setDefaultAggregatedRatingsIndex(),
+      ceramic.setDefaultCuratedDocsIndex(),
+    ]);
+    logIndexer(`Set default 'AggregatedRatingsIndex' and 'CuratedDocsIndex'`);
+  }
+
+  logIndexer('Indexer IDX initialized 🥳');
+}
+
+export async function setIndexDocsListeners(): Promise<void> {
+  const subscribedDIDs = db.getDIDs();
+  const indexDocsOfSubscribedDIDs = await loadIndexDocumentsOfDIDs(
+    subscribedDIDs
+  );
+
+  for (const indexDoc of indexDocsOfSubscribedDIDs) {
+    indexDoc.removeAllListeners('change');
+    indexDoc.addListener('change', () => handleIndexDocChange(indexDoc));
+  }
+}
+
+export async function loadIndexDocumentsOfDIDs(
+  dids: string[]
+): Promise<Doctype[]> {
+  logIndexer(`Loading index docs of ${dids.length} did/s...`);
+
+  const indexDocIDs = await Promise.all(
+    dids
+      .map((did) => {
+        return [
+          ceramic.getBookmarksIndexDocID(did),
+          ceramic.getRatingsIndexDocID(did),
+        ];
+      })
+      .flat()
+  );
+
+  const indexDocs = await Promise.all(
+    indexDocIDs
+      .filter((indexDocID) => Boolean(indexDocID))
+      .map((indexDocID: any) => ceramic.loadDocument(indexDocID))
+  );
+
+  logIndexer(`${indexDocs.length} index docs loaded`);
+
+  return indexDocs;
+}
+
+function handleIndexDocChange(doc: Doctype) {
+  if (indexDocIDToPrevLogsLength[doc.id.toUrl()] === doc.state.log.length) {
+    return;
+  }
+  indexDocIDToPrevLogsLength[doc.id.toUrl()] = doc.state.log.length;
+
+  switch (doc.metadata.family) {
+    case definitions.BookmarksIndex.replace('ceramic://', ''):
+      bookmarksIndexer.handleBookmarksIndexDocChange(doc);
+      break;
+    case definitions.RatingsIndex.replace('ceramic://', ''):
+      ratingsIndexer.handleRatingsIndexDocChange(doc);
+      break;
+    default:
+      break;
   }
 }
