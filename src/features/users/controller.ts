@@ -29,7 +29,7 @@ export async function subscribe(req: Request, res: Response): Promise<void> {
     // TODO: verify did signature
     const { did } = req.body;
     await subscribeToRecommender(did);
-    res.status(200).send();
+    res.status(200).json({});
   } catch (error) {
     res.status(400).json(error.message);
   }
@@ -45,7 +45,7 @@ export async function unsubscribe(req: Request, res: Response): Promise<void> {
     // TODO: verify did signature
     const { did } = req.body;
     await unsubscribeFromRecommender(did);
-    res.status(200).send();
+    res.status(200).json({});
   } catch (error) {
     res.status(400).json(error.message);
   }
