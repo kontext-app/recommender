@@ -63,11 +63,16 @@ export async function updateAggregatedRatingsOfIndexKeyWithRatingDocIDs(
       const ratingDocID = ratingDocIDs[index];
       const { ratedDocId } = value;
 
-      const existingAggregatedRatingForRatedDocID =
-        aggregatedRatingsDocContent[ratedDocId];
+      const aggregatedRatingForRatedDocID = aggregatedRatingsDocContent[
+        ratedDocId
+      ] || {
+        ratedDocId,
+        aggregatedRating: 0,
+        aggregatedRatingDocIds: [],
+      };
 
       if (
-        existingAggregatedRatingForRatedDocID?.aggregatedRatingDocIds.includes(
+        aggregatedRatingForRatedDocID?.aggregatedRatingDocIds.includes(
           ratingDocID
         )
       ) {
@@ -75,11 +80,11 @@ export async function updateAggregatedRatingsOfIndexKeyWithRatingDocIDs(
       }
 
       const updatedAggregatedRatingDocIDs = [
-        ...existingAggregatedRatingForRatedDocID.aggregatedRatingDocIds,
+        ...aggregatedRatingForRatedDocID.aggregatedRatingDocIds,
         ratingDocID,
       ];
       aggregatedRatingsDocContentChange[ratedDocId] = {
-        ...existingAggregatedRatingForRatedDocID,
+        ...aggregatedRatingForRatedDocID,
         aggregatedRatingDocIds: updatedAggregatedRatingDocIDs,
       };
     }
