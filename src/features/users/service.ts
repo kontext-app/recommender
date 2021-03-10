@@ -1,11 +1,9 @@
-import { upsertUser } from 'app/db';
+import { putDID, removeDID } from 'app/db';
 
 export async function subscribeToRecommender(did: string): Promise<void> {
-  await upsertUser({ did, recommendationsEnabled: true });
-  return;
+  putDID(did);
 }
 
 export async function unsubscribeFromRecommender(did: string): Promise<void> {
-  await upsertUser({ did, recommendationsEnabled: false });
-  return;
+  removeDID(did);
 }

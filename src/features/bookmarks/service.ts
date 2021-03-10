@@ -1,48 +1,12 @@
-import * as db from 'app/db';
-import { convertTimeFilterToEndIntervalISOString } from 'features/bookmarks/utils';
+import * as ceramic from 'app/ceramic';
 
-import type { Bookmark } from 'app/db';
+export async function getCuratedBookmarkDocsDocID(): Promise<string | null> {
+  const curatedDocsIndexDocContent = await ceramic.getCuratedDocsIndexDocContent();
 
-type TimeFilter = 'all' | 'year' | 'month' | 'week' | 'day' | string;
+  if (!curatedDocsIndexDocContent) {
+    return null;
+  }
 
-export async function getMostPopularBookmarks(
-  timeFilter: TimeFilter
-): Promise<Bookmark[]> {
-  const endIntervalISOString = convertTimeFilterToEndIntervalISOString(
-    timeFilter
-  );
-  return db.findAllBookmarks(
-    { creationDate: { $gte: endIntervalISOString } },
-    { totalNumVotes: -1 }
-  );
-}
-
-export async function getMostRecentBookmarks(
-  timeFilter: TimeFilter
-): Promise<Bookmark[]> {
-  const endIntervalISOString = convertTimeFilterToEndIntervalISOString(
-    timeFilter
-  );
-  return db.findAllBookmarks(
-    { creationDate: { $gte: endIntervalISOString } },
-    { creationDate: -1 }
-  );
-}
-
-export async function upVoteBookmark(
-  bookmarkDocID: string,
-  voterDID: string
-): Promise<void> {
-  return db.upVoteBookmark(bookmarkDocID, voterDID);
-}
-
-export async function downVoteBookmark(
-  bookmarkDocID: string,
-  voterDID: string
-): Promise<void> {
-  return db.downVoteBookmark(bookmarkDocID, voterDID);
-}
-
-export async function shareBookmark(bookmarkDocID: string): Promise<void> {
-  return db.incrementNumOfShares(bookmarkDocID);
+  const curatedBookmarkDocsDocID = curatedDocsIndexDocContent?.bookmarks;
+  return curatedBookmarkDocsDocID;
 }

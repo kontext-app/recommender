@@ -6,6 +6,7 @@ import cors from 'cors';
 import config from 'app/config';
 import { logRecommender } from 'app/logger';
 import bookmarksRouter from 'features/bookmarks/router';
+import ratingsRouter from 'features/ratings/router';
 import usersRouter from 'features/users/router';
 
 const app = express();
@@ -18,6 +19,7 @@ export function startRecommender(): void {
   app.use(bodyParser.json());
 
   app.use('/api/v1/bookmarks', bookmarksRouter);
+  app.use('/api/v1/ratings', ratingsRouter);
   app.use('/api/v1/users', usersRouter);
 
   app.listen(config.PORT, () => {
