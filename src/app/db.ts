@@ -10,7 +10,7 @@ db.defaults({ dids: [] }).write();
 
 export function putDID(did: string): void {
   const dids = db.get('dids').value();
-  const uniqueDIDs = Array.from(new Set(dids));
+  const uniqueDIDs = Array.from(new Set([...dids, did]));
   db.set('dids', uniqueDIDs).write();
 }
 
