@@ -9,7 +9,9 @@ const db = low(adapter);
 db.defaults({ dids: [] }).write();
 
 export function putDID(did: string): void {
-  db.get('dids').push(did).uniq().write();
+  const dids = db.get('dids').value();
+  const uniqueDIDs = Array.from(new Set(dids));
+  db.set('dids', uniqueDIDs).write();
 }
 
 export function removeDID(did: string): void {
