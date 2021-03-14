@@ -16,7 +16,6 @@ const app = express();
 
 export function startRecommender(): void {
   if (process.env.NODE_ENV === 'production') {
-    console.log(path.join(__dirname, '/../../logs'));
     app.use(
       morgan('combined', {
         stream: rfs.createStream('recommender-access.log', {
