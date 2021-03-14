@@ -22,8 +22,6 @@ export async function startIndexer(): Promise<void> {
     `Starting indexer with doc sync interval ${config.SYNC_INTERVAL} ms`
   );
 
-  await initializeIndexerIDX();
-
   await setIndexDocsListeners();
   setInterval(() => {
     setIndexDocsListeners();
