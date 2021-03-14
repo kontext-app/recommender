@@ -36,6 +36,10 @@ export async function loadDocument(docID: string): Promise<Doctype> {
   return ceramic.loadDocument(docID);
 }
 
+export async function close(): Promise<void> {
+  return ceramic.close();
+}
+
 //#region 3ID
 
 export async function authenticateWithSeed(seed: Uint8Array): Promise<void> {

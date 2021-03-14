@@ -68,13 +68,14 @@ export async function initializeIndexerIDX(): Promise<void> {
 }
 
 export async function setIndexDocsListeners(): Promise<void> {
+  await ceramic.close();
+
   const subscribedDIDs = db.getDIDs();
   const indexDocsOfSubscribedDIDs = await loadIndexDocumentsOfDIDs(
     subscribedDIDs
   );
 
   for (const indexDoc of indexDocsOfSubscribedDIDs) {
-    indexDoc.removeAllListeners('change');
     indexDoc.addListener('change', () => handleIndexDocChange(indexDoc));
   }
 }
