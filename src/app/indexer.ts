@@ -15,6 +15,8 @@ const indexDocIDToPrevLogsLength: {
   [indexDocID: string]: number;
 } = {};
 
+let loadedIndexDocs: Doctype[] = [];
+
 export async function startIndexer(): Promise<void> {
   logIndexer.info(
     `Starting indexer with doc sync interval ${config.SYNC_INTERVAL} ms`
@@ -68,15 +70,21 @@ export async function initializeIndexerIDX(): Promise<void> {
 }
 
 export async function setIndexDocsListeners(): Promise<void> {
-  await ceramic.close();
+  await clearLoadedIndexDocs();
 
   const subscribedDIDs = db.getDIDs();
-  const indexDocsOfSubscribedDIDs = await loadIndexDocumentsOfDIDs(
-    subscribedDIDs
-  );
+  loadedIndexDocs = await loadIndexDocumentsOfDIDs(subscribedDIDs);
 
-  for (const indexDoc of indexDocsOfSubscribedDIDs) {
+  for (const indexDoc of loadedIndexDocs) {
     indexDoc.addListener('change', () => handleIndexDocChange(indexDoc));
+  }
+}
+
+export async function clearLoadedIndexDocs(): Promise<void> {
+  await ceramic.close();
+
+  for (const loadedIndexDoc of loadedIndexDocs) {
+    loadedIndexDoc.removeAllListeners('change');
   }
 }
 
