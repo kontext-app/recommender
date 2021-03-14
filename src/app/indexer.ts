@@ -16,7 +16,7 @@ const indexDocIDToPrevLogsLength: {
 } = {};
 
 export async function startIndexer(): Promise<void> {
-  logIndexer(
+  logIndexer.info(
     `Starting indexer with doc sync interval ${config.SYNC_INTERVAL} ms`
   );
 
@@ -28,26 +28,26 @@ export async function startIndexer(): Promise<void> {
   }, config.SYNC_INTERVAL * 5);
 
   setInterval(() => {
-    logIndexer(
+    logIndexer.debug(
       "Update index key 'bookmarks' of AggregatedRatings with new scores..."
     );
     ratingsIndexer.updateAggregatedRatingsOfIndexKeyWithNewScores(
       enums.DefaultAggregatedRatingsIndexKeys.BOOKMARKS
     );
-    logIndexer(
+    logIndexer.debug(
       "Index key 'bookmarks' of AggregatedRatings updated with new scores"
     );
   }, config.SYNC_INTERVAL * 10);
 }
 
 export async function initializeIndexerIDX(): Promise<void> {
-  logIndexer('Initialize Indexer IDX...');
+  logIndexer.debug('Initialize Indexer IDX...');
 
   ceramic.initialize();
-  logIndexer(`Initialize Ceramic and IDX`);
+  logIndexer.debug(`Initialize Ceramic and IDX`);
 
   await ceramic.authenticateWithSeed(utils.arrayify(config.THREE_ID_SEED));
-  logIndexer(`Authenticate IDX with seed of indexer`);
+  logIndexer.debug(`Authenticate IDX with seed of indexer`);
 
   const [hasAggregatedRatingsIndex, hasCuratedDocsIndex] = await Promise.all([
     ceramic.hasAggregatedRatingsIndex(),
@@ -59,10 +59,12 @@ export async function initializeIndexerIDX(): Promise<void> {
       ceramic.setDefaultAggregatedRatingsIndex(),
       ceramic.setDefaultCuratedDocsIndex(),
     ]);
-    logIndexer(`Set default 'AggregatedRatingsIndex' and 'CuratedDocsIndex'`);
+    logIndexer.debug(
+      `Set default 'AggregatedRatingsIndex' and 'CuratedDocsIndex'`
+    );
   }
 
-  logIndexer('Indexer IDX initialized 🥳');
+  logIndexer.debug('Indexer IDX initialized 🥳');
 }
 
 export async function setIndexDocsListeners(): Promise<void> {
@@ -80,7 +82,7 @@ export async function setIndexDocsListeners(): Promise<void> {
 export async function loadIndexDocumentsOfDIDs(
   dids: string[]
 ): Promise<Doctype[]> {
-  logIndexer(`Loading index docs of ${dids.length} did/s...`);
+  logIndexer.debug(`Loading index docs of ${dids.length} did/s...`);
 
   const indexDocIDs = await Promise.all(
     dids
@@ -99,7 +101,7 @@ export async function loadIndexDocumentsOfDIDs(
       .map((indexDocID: any) => ceramic.loadDocument(indexDocID))
   );
 
-  logIndexer(`${indexDocs.length} index docs loaded`);
+  logIndexer.debug(`${indexDocs.length} index docs loaded`);
 
   return indexDocs;
 }

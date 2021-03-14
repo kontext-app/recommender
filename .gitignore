@@ -3,3 +3,4 @@ build
 .env.local
 yarn-error.log
 db.json
+logs

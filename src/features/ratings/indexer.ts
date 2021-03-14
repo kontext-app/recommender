@@ -22,14 +22,14 @@ export async function handleRatingsIndexDocChange(
   }
   indexDocIDToPrevItemsLength[doc.id.toUrl()] = doc.content.bookmarks.length;
 
-  logIndexer(
+  logIndexer.debug(
     `Index key 'bookmarks' of RatingsIndex from ${doc.metadata.controllers} changed`
   );
 
   const aggregatedRatingsIndexDocID = await ceramic.getAggregatedRatingsIndexDocID();
 
   if (!aggregatedRatingsIndexDocID) {
-    logIndexer('Error: AggregatedRatingsIndex doc not found!');
+    logIndexer.debug('Error: AggregatedRatingsIndex doc not found!');
     return;
   }
 
@@ -45,7 +45,7 @@ export async function updateAggregatedRatingsOfIndexKeyWithRatingDocIDs(
   ratingDocIDs: string[],
   indexKey: string
 ): Promise<AggregatedRatingsDocContent> {
-  logIndexer(
+  logIndexer.debug(
     `Updating aggregatedRatingDocIds of '${indexKey}' index key AggregatedRatings...`
   );
 
@@ -98,7 +98,7 @@ export async function updateAggregatedRatingsOfIndexKeyWithRatingDocIDs(
     aggregatedRatingsDocContentChange
   );
 
-  logIndexer(
+  logIndexer.debug(
     `AggregatedRatingDocIds of '${indexKey}' index key AggregatedRatings updated`
   );
 
@@ -108,7 +108,7 @@ export async function updateAggregatedRatingsOfIndexKeyWithRatingDocIDs(
 export async function updateAggregatedRatingsOfIndexKeyWithNewScores(
   indexKey: string
 ): Promise<AggregatedRatingsDocContent> {
-  logIndexer(
+  logIndexer.debug(
     `Updating aggregatedRatings of '${indexKey}' index key AggregatedRatings...`
   );
 
@@ -142,7 +142,7 @@ export async function updateAggregatedRatingsOfIndexKeyWithNewScores(
     aggregatedRatingsWithNewScores
   );
 
-  logIndexer(`AggregatedRatings of index key '${indexKey}' updated`);
+  logIndexer.debug(`AggregatedRatings of index key '${indexKey}' updated`);
 
   return updatedContent;
 }

@@ -1,17 +1,29 @@
-import chalk from 'chalk';
-import { formatISO } from 'date-fns';
+import winston from 'winston';
 
-export const logIndexer = makeLogger(chalk.cyan('[indexer]'));
+const { combine, timestamp, label, printf, colorize } = winston.format;
 
-export const logRecommender = makeLogger(chalk.yellow('[recomme]'));
+const logFormat = printf(({ level, message, label, timestamp }) => {
+  return `${timestamp} [${label}] ${level}: ${message}`;
+});
 
-function makeLogger(prefix: string) {
-  function logger(message: string) {
-    return console.log(
-      `${prefix.padEnd(10, ' ')} ${chalk.green(
-        formatISO(new Date(), { representation: 'time' })
-      )} ${message}`
-    );
-  }
+export const logIndexer = makeLogger('indexer');
+
+export const logRecommender = makeLogger('recommender');
+
+function makeLogger(logLabel: string) {
+  const logger = winston.createLogger({
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    format: combine(
+      colorize(),
+      label({ label: logLabel }),
+      timestamp(),
+      logFormat
+    ),
+    transports: [
+      process.env.NODE_ENV === 'production'
+        ? new winston.transports.File({ filename: 'logs/info.log' })
+        : new winston.transports.Console(),
+    ],
+  });
   return logger;
 }

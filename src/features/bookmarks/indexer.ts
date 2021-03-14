@@ -19,27 +19,27 @@ export async function handleBookmarksIndexDocChange(
   }
   indexDocIDToPrevItemsLength[doc.id.toUrl()] = doc.content.public.length;
 
-  logIndexer(
+  logIndexer.debug(
     `Index key 'public' of BookmarksIndex from ${doc.metadata.controllers} changed`
   );
 
   const curatedDocsIndex = await ceramic.getCuratedDocsIndexDocContent();
 
   if (!curatedDocsIndex) {
-    logIndexer('Error: CuratedDocsIndex doc not found!');
+    logIndexer.warn('Error: CuratedDocsIndex doc not found!');
     return;
   }
 
   const curatedBookmarkDocsDocID =
     curatedDocsIndex[enums.DefaultCuratedDocsIndexKeys.BOOKMARKS];
 
-  logIndexer(`Updating CuratedDocsDoc 'recent' index key...`);
+  logIndexer.debug(`Updating CuratedDocsDoc 'recent' index key...`);
   await updateIndexKeyOfCuratedDocs({
     curatedDocsDocID: curatedBookmarkDocsDocID,
     docIDsOfChangedIndexDoc: doc.content.public,
     curatedDocsIndexKey: enums.DefaultCuratedDocsKeys.RECENT,
   });
-  logIndexer(`Index key 'recent' of CuratedDocsDoc updated`);
+  logIndexer.debug(`Index key 'recent' of CuratedDocsDoc updated`);
 }
 
 export async function updateIndexKeyOfCuratedDocs(params: {

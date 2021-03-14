@@ -2,9 +2,12 @@ import express from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import * as rfs from 'rotating-file-stream';
+import path from 'path';
 
 import config from 'app/config';
 import { logRecommender } from 'app/logger';
+
 import bookmarksRouter from 'features/bookmarks/router';
 import ratingsRouter from 'features/ratings/router';
 import usersRouter from 'features/users/router';
@@ -12,7 +15,20 @@ import usersRouter from 'features/users/router';
 const app = express();
 
 export function startRecommender(): void {
-  app.use(morgan('dev'));
+  if (process.env.NODE_ENV === 'production') {
+    console.log(path.join(__dirname, '/../../logs'));
+    app.use(
+      morgan('combined', {
+        stream: rfs.createStream('recommender-access.log', {
+          interval: '1d',
+          path: path.join(__dirname, '/../../logs'),
+        }),
+      })
+    );
+  } else {
+    app.use(morgan('dev'));
+  }
+
   app.use(cors());
 
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -23,8 +39,8 @@ export function startRecommender(): void {
   app.use('/api/v1/users', usersRouter);
 
   app.listen(config.PORT, () => {
-    logRecommender(
-      `Recommender service is running at https://localhost:${config.PORT}`
+    logRecommender.info(
+      `Recommender service is running at http://localhost:${config.PORT}`
     );
   });
 }
