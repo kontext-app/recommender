@@ -4,9 +4,16 @@ import { initCache } from 'app/cache';
 
 async function startApp() {
   try {
-    await initCache();
-    await startIndexer();
-    await startRecommender();
+    const args = process.argv.slice(2);
+
+    if (args.includes('indexer')) {
+      await startIndexer();
+    }
+
+    if (args.includes('recommender')) {
+      initCache();
+      startRecommender();
+    }
   } catch (error) {
     console.error(error);
   }

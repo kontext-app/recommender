@@ -24,8 +24,11 @@
     "winston": "^3.3.3"
   },
   "scripts": {
-    "start": "tsc && NODE_PATH=./build node build/app.js",
-    "start:prod": "NODE_ENV=production yarn start",
+    "start": "tsc && NODE_PATH=./build node build/app.js indexer recommender",
+    "start:indexer": "tsc && NODE_PATH=./build node build/app.js indexer",
+    "start:recommender": "tsc && NODE_PATH=./build node build/app.js recommender",
+    "start:indexer:prod": "NODE_ENV=production yarn start:indexer",
+    "start:recommender:prod": "NODE_ENV=production yarn start:recommender",
     "dev": "NODE_PATH=./src nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts",
     "test": "jest"
   },

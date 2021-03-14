@@ -81,11 +81,11 @@ export async function setIndexDocsListeners(): Promise<void> {
 }
 
 export async function clearLoadedIndexDocs(): Promise<void> {
-  await ceramic.close();
-
   for (const loadedIndexDoc of loadedIndexDocs) {
-    loadedIndexDoc.removeAllListeners('change');
+    loadedIndexDoc.removeAllListeners();
   }
+
+  await ceramic.close();
 }
 
 export async function loadIndexDocumentsOfDIDs(
