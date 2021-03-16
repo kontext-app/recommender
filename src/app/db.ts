@@ -4,7 +4,7 @@ import FileSync from 'lowdb/adapters/FileSync';
 const adapter = new FileSync<{
   dids: string[];
 }>('db.json');
-const db = low(adapter);
+let db = low(adapter);
 
 db.defaults({ dids: [] }).write();
 
@@ -19,5 +19,6 @@ export function removeDID(did: string): void {
 }
 
 export function getDIDs(): string[] {
+  db = low(adapter);
   return db.get('dids').value();
 }
