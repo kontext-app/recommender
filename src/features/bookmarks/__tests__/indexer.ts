@@ -18,7 +18,7 @@ describe('bookmarks indexer', () => {
         {
           curatedDocsDocID: 'ceramic://',
           curatedDocsIndexKey: 'curatedDocsIndexKey',
-          docIDsOfChangedIndexDoc: ['ceramic://2'],
+          docIDsToAdd: ['ceramic://2'],
         }
       );
 
@@ -32,7 +32,7 @@ describe('bookmarks indexer', () => {
         {
           curatedDocsDocID: 'ceramic://',
           curatedDocsIndexKey: 'curatedDocsIndexKey',
-          docIDsOfChangedIndexDoc: ['ceramic://1'],
+          docIDsToAdd: ['ceramic://1'],
         }
       );
 

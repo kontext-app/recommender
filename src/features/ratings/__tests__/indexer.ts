@@ -50,18 +50,4 @@ describe('ratings indexer', () => {
       });
     });
   });
-
-  describe('#calculateScoreOfAggregatedRating', () => {
-    it('should return aggregated rating', async () => {
-      const aggregatedRating = await ratingsIndexer.calculateScoreOfAggregatedRating(
-        {
-          ratedDocId: 'ceramic://ratedDocId1',
-          aggregatedRatingDocIds: [MOCK_RATING_1.docId, MOCK_RATING_2.docId],
-          aggregatedRating: 10,
-        }
-      );
-
-      expect(aggregatedRating).toEqual(15);
-    });
-  });
 });

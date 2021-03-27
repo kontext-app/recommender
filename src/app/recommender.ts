@@ -31,7 +31,7 @@ export function startRecommender(): void {
   app.use(
     cors(
       process.env.NODE_ENV === 'production'
-        ? { origin: 'app.kontext.app' }
+        ? { origin: 'http://app.kontext.app' }
         : { origin: '*' }
     )
   );
