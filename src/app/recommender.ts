@@ -28,7 +28,13 @@ export function startRecommender(): void {
     app.use(morgan('dev'));
   }
 
-  app.use(cors());
+  app.use(
+    cors(
+      process.env.NODE_ENV === 'production'
+        ? { origin: 'app.kontext.app' }
+        : { origin: '*' }
+    )
+  );
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());

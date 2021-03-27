@@ -18,7 +18,7 @@ let ceramic: CeramicClient;
 
 function initializeCeramic(): void {
   ceramic = apis.ceramic.createCeramic(config.CERAMIC_API_HOST, {
-    docSyncEnabled: true,
+    docSyncEnabled: false,
     docSyncInterval: config.SYNC_INTERVAL,
   });
 }
